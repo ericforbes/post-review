@@ -11,7 +11,7 @@ def _config_path():
 def _fetch(section, key):
     config = SafeConfigParser()
     config.read(_config_path())
-    
+
     try:
         data = config.get(section, key)
         return data
@@ -33,8 +33,8 @@ def _insert(section, key, value):
         config.write(configfile)
     return 1
 
-def put_config(setting, key, value):
-    return _insert(setting, key, value)
+def put_config(section, key, value):
+    return _insert(section, key, value)
 
 def get_user_setting(arg):
     return _fetch('user_settings', arg)
