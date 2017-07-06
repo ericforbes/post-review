@@ -3,6 +3,7 @@ import argparse
 import sys
 import os
 from config import setup
+from configprocesser import get_user_setting
 
 def SetupConfiguration():
     setup()
@@ -24,3 +25,4 @@ def main():
     if len(sys.argv) == 1:
         parser.print_help();
         sys.exit()
+

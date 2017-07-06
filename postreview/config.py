@@ -1,6 +1,6 @@
 import sys
 import os
-from logger import get_logger
+from logger import create_logger
 from configprocesser import get_configuration, get_user_setting, put_user_setting, get_endpoint, put_config
 
 def _setup_ssh(logger):
@@ -72,7 +72,7 @@ def _setup_git_service(logger):
                 print("Error: Enter valid enterprise GitLab URL (ex// gitlab.mycompany.com)")	
 
 def setup():
-    logger = get_logger()
+    logger = create_logger()
     _setup_git_service(logger)
     _setup_ssh(logger)
     put_user_setting('first_time_setup', 'False')
