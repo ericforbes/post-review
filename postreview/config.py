@@ -2,6 +2,70 @@ import sys
 import os
 from logger import create_logger
 from configprocesser import get_configuration, get_user_setting, put_user_setting, get_endpoint, put_config
+import subprocess
+from GitServiceManager import GitServiceManager
+import re
+
+class ConfigManager(object):
+
+    def __init__(self):
+        self.logger = create_logger()
+        self._integrity_check()
+
+    def _integrity_check(self):
+        self.root_working_tree = self._show_top_level()
+        
+        config_file = self.root_working_tree + "/" + ".postreview"
+        if not os.path.isfile(config_file):
+            open(config_file, 'a').close()
+
+    def _show_top_level(self):
+        return run_cmd("git rev-parse --show-toplevel").rstrip()
+
+    def _determine_git_service(self):
+
+        #TODO: Immediate
+        #How does this differ from HTTPS git remote setup vs SSH git remote setup
+        # https://help.github.com/articles/changing-a-remote-s-url/
+        remote_origin_url = run_cmd("git config --get remote.origin.url").rstrip()
+        matchObj = re.search(r'@+(?P<git_service>.*)?:', remote_origin_url)
+        if not matchObj.group('git_service'):
+            self.logger.fatal("Unable to determine git hosting service")
+            sys.exit()
+
+        for engine in GitServiceManager.GIT_SERVICES:
+            if engine.SERVICE_NAME in matchObj.group('git_service'):
+                #TODO: Immediate
+                # how are we going to handle domains that include both service names?
+                # ex// github orginization actually used gitlab:  gitlab.github.com
+                # we need to figure out how each service wants their domain configured
+                #Gitlab supports relative URL https://docs.gitlab.com/omnibus/settings/configuration.html
+
+                print "FOUND IT"
+
+
+    def setup(self):
+        self._determine_git_service()
+        #setup ssh
+        #setup gitservice try and guess: git config --get remote.origin.url
+
+def run_cmd(cmd):
+    cmd_list = cmd.split()
+    try:
+        output = subprocess.Popen(
+        cmd_list,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE).communicate()
+
+        return output[0]
+
+    except OSError as e:
+        self.logger.fatal("'%s' is either not in your path or is not installed" % cmd_list[0])
+        sys.exit()
+    except IndexError as e:
+        self.logger.error("Unexpected response from `%s`" % cmd)
+        sys.exit()
+
 
 def _setup_ssh(logger, profile):
 
@@ -75,6 +139,11 @@ def _setup_git_service(logger, profile):
 
 
 def setup(profile='default'):
+    confmgr = ConfigManager()
+    confmgr.setup()
+    print "hosting"
+    print confmgr.root_working_tree
+    sys.exit()
     logger = create_logger()
     _setup_git_service(logger, profile)
     _setup_ssh(logger, profile)
