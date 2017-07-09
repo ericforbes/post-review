@@ -23,24 +23,20 @@ class ConfigManager(object):
         return run_cmd("git rev-parse --show-toplevel").rstrip()
 
     def _determine_git_service(self):
-
-        #TODO: Immediate
-        #How does this differ from HTTPS git remote setup vs SSH git remote setup
-        # https://help.github.com/articles/changing-a-remote-s-url/
+        #Handles both SSH and HTTPS
+        #No support for relative URL path, only (sub)domain: https://docs.gitlab.com/omnibus/settings/configuration.html
         remote_origin_url = run_cmd("git config --get remote.origin.url").rstrip()
-        matchObj = re.search(r'@+(?P<git_service>.*)?:', remote_origin_url)
-        if not matchObj.group('git_service'):
-            self.logger.fatal("Unable to determine git hosting service")
+        matchObj = re.search(r'@+(?P<ssh_git_url>.*)?:|https://(?P<https_git_url>.*)?/', remote_origin_url)
+
+        if not matchObj.group('ssh_git_url') and not matchObj.group('https_git_url'):
+            self.logger.fatal("Unable to determine git hosting service: %s" % remote_origin_url)
+            self.logger.fatal("Are you using a relative URL path instead of a (sub)domain?")
             sys.exit()
 
-        for engine in GitServiceManager.GIT_SERVICES:
-            if engine.SERVICE_NAME in matchObj.group('git_service'):
-                #TODO: Immediate
-                # how are we going to handle domains that include both service names?
-                # ex// github orginization actually used gitlab:  gitlab.github.com
-                # we need to figure out how each service wants their domain configured
-                #Gitlab supports relative URL https://docs.gitlab.com/omnibus/settings/configuration.html
+        cleaned_git_domain_url = matchObj.group('ssh_git_url') or matchObj.group('https_git_url')
 
+        for engine in GitServiceManager.GIT_SERVICES:
+            if engine.SERVICE_NAME in cleaned_git_domain_url:
                 print "FOUND IT"
 
 

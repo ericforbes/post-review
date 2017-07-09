@@ -8,9 +8,9 @@ def create_logger():
     root = logging.getLogger()
     root.setLevel(logging.getLevelName('DEBUG'))
 
-    #Add handler for standard output any errors+
+    #Add handler for standard output any debug+
     ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(logging.getLevelName('ERROR'))
+    ch.setLevel(logging.getLevelName('DEBUG'))
     formatter = logging.Formatter('%(levelname)s - %(message)s')
     ch.setFormatter(formatter)
     root.addHandler(ch)
