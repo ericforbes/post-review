@@ -2,6 +2,7 @@ from BaseService import BaseService
 
 class GitLabService(BaseService):
     SERVICE_NAME = "gitlab"
+    GIT_CONFIG_API_KEY = "postreview.gitlab.key"
 
     def __str__(self):
         return SERVICE_NAME
