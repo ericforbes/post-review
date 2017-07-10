@@ -27,6 +27,7 @@ def main():
     #    SetupConfiguration()
     #    sys.exit()
 
+
     if len(sys.argv) == 1:
         parser.print_help();
         sys.exit()
