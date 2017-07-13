@@ -16,8 +16,6 @@ class BaseService(object):
 
     __metaclass__ = Meta
 
-    def push_to_remote(self):
-        raise NotImplementedError()
 
     def issue_pull_request(self):
         raise NotImplementedError()
