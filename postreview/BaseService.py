@@ -9,9 +9,9 @@ class BaseService(object):
     GIT_CONFIG_API_KEY = None
     API = None
 
-    def __init__(self, source, remote, logger):
+    def __init__(self, source, parent, logger):
         self.source_branch = source
-        self.remote_branch = remote
+        self.parent_branch = parent
         self.logger = logger
 
     __metaclass__ = Meta
