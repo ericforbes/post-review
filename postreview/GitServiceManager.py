@@ -16,7 +16,6 @@ class GitServiceManager(object):
     def __init__(self, parent_branch):
         self.logger = create_logger()
         git_domain_url = self._determine_git_service()
-        print "sdfsdf"
         self.source_branch = self._determine_current_branch()
         self.parent_branch = parent_branch
 
@@ -28,19 +27,18 @@ class GitServiceManager(object):
         self._get_set_api_token()
 
 
-    def _get_merge_message(self):
-        return raw_input("Enter a merge message (can edit later): ")
+    def _get_last_commit_msg(self):
+        return self._run_cmd("git log -1 --pretty=%B").strip()
 
 
     def _get_set_api_token(self):
         #Get API token
         key = self._run_cmd("git config %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
-        print key
         if not key:
             self.logger.info("(One Time Setup) Please enter credentials to request API key")
-            u = raw_input("%s username: " % self.git_service_engine.SERVICE_NAME)
-            p = getpass.getpass("%s password: " % self.git_service_engine.SERVICE_NAME)
-            key = self.git_service_engine._request_token(u, p)
+            user = raw_input("%s username: " % self.git_service_engine.SERVICE_NAME)
+            pw = getpass.getpass("%s password: " % self.git_service_engine.SERVICE_NAME)
+            key = self.git_service_engine._request_token(user, pw)
 
             self._run_cmd("git config %s %s" % (self.git_service_engine.GIT_CONFIG_API_KEY, key))
 
@@ -49,7 +47,7 @@ class GitServiceManager(object):
 
     def _push_branch_to_remote(self):
         cmd = "git push origin HEAD:%s" % self.source_branch
-        u = raw_input("\n\nPush local branch [%s] to remote [%s]:  Yes or no? " % (self.source_branch, self.source_branch))
+        u = raw_input("\n\nPushing local branch [%s] to remote [%s]:  Yes or no? " % (self.source_branch, self.source_branch))
         if u.lower() != 'yes' and u.lower() != 'y':
             self.logger.info("Exiting..")
             sys.exit()
@@ -71,7 +69,6 @@ class GitServiceManager(object):
         #Handles both SSH and HTTPS
         #No support for relative URL path, only (sub)domain: https://docs.gitlab.com/omnibus/settings/configuration.html
         self.remote_origin_url = self._run_cmd("git config --get remote.origin.url").rstrip()
-        print self.remote_origin_url
         matchObj = re.search(r'@+(?P<ssh_git_url>.*)?:|https://(?P<https_git_url>.*)?/', self.remote_origin_url)
 
         if not matchObj.group('ssh_git_url') and not matchObj.group('https_git_url'):
@@ -96,7 +93,7 @@ class GitServiceManager(object):
 
         params = {}
         if self.git_service_engine.SERVICE_NAME == 'github':
-            params = {'message': self._get_merge_message(), 'remote_url': self.remote_origin_url, 'api_token': token}
+            params = {'message': self._get_last_commit_msg(), 'remote_url': self.remote_origin_url, 'api_token': token}
         elif self.git_service_engine.SERVICE_NAME == 'gitlab':
             params = {'stuff': 'here'} 
 
