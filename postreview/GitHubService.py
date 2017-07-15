@@ -31,13 +31,11 @@ class GitHubService(BaseService):
             'head': self.source_branch,
             'base': self.parent_branch
         }
-        print params
         #/repos/:owner/:repo/pulls
         #"Authorization: token OAUTH-TOKEN"
         # TODO  before EVERY REQUEST... BEFORE!!.. check if current API key is valid. add a @handler at top to do this.
         #  for example. i run this tool and it creates the key. i go into github and delete it. 
         url = urljoin(self.API, 'repos/%s/%s/pulls' % (owner, project_name))
-        print url
         headers = {"Authorization": "token %s" % api_token}
         res = {}
 
@@ -53,8 +51,6 @@ class GitHubService(BaseService):
 
 
         json_response = json.loads(res.text)
-        print json_response
-        print res
         if res.status_code >= 400:
 
             try:
@@ -64,18 +60,23 @@ class GitHubService(BaseService):
 
             self.logger.fatal("Error: Could not create merge request, %s: %s" % (json_response['message'], err_msg))
             sys.exit()
-        
-        print "GitHub: issue pull request from %s to %s" % (self.source_branch, self.parent_branch)
-        print j
+        elif res.status_code == 201:
+            try:
+                pr_href = json_response['html']['href']
+            except:
+                pr_href = "Merge request succeeded, but no URL was returned."
+
+            self.logger.info(pr_href)
+        else:
+            self.logger.info(json_response)
+
 
     def _repo_information(self, remote_origin):
         match_str = ""
         matchObj = re.search(r'git@github.com:(?P<ssh_owner_project>.*)\.git|https://github.com/(?P<https_owner_project>.*)\.git', remote_origin)
         if matchObj.group('ssh_owner_project'):
-            print matchObj.group('ssh_owner_project')
             match_str = matchObj.group('ssh_owner_project').split("/")
         elif matchObj.group('https_owner_project'):
-            print matchObj.group('https_owner_project')
             match_str = matchObj.group('https_owner_project').split("/")
         else:
             self.logger.error("Error: Unable to determine owner of GitHub repository")
@@ -97,16 +98,14 @@ class GitHubService(BaseService):
             'client_secret': self.CLIENT_SECRET,
             'scopes': ['public_repo', 'repo']
         }
-        print params
-        print url
+
         res = requests.put(
             url,
             auth = (user,pw),
             data = json.dumps(params)
             )
-        print res.text
+
         j = json.loads(res.text)
-        print j
 
         if res.status_code >= 400:
             msg = j.get('message', 'UNDEFINED ERROR (no error description from server)')
