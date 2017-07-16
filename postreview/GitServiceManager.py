@@ -38,7 +38,11 @@ class GitServiceManager(object):
             self.logger.info("(One Time Setup) Please enter credentials to request API key")
             user = raw_input("%s username: " % self.git_service_engine.SERVICE_NAME)
             pw = getpass.getpass("%s password: " % self.git_service_engine.SERVICE_NAME)
-            key = self.git_service_engine._request_token(user, pw)
+            key, err = self.git_service_engine._request_token(user, pw)
+
+            if (key == -1):
+                self.logger.fatal(msg)
+                sys.exit()
 
             self._run_cmd("git config %s %s" % (self.git_service_engine.GIT_CONFIG_API_KEY, key))
 
@@ -82,7 +86,7 @@ class GitServiceManager(object):
     def _choose_engine(self, domain):
         for engine in GitServiceManager.GIT_SERVICES:
             if engine.SERVICE_NAME in domain:
-                return engine(self.source_branch, self.parent_branch, self.logger)
+                return engine(self.source_branch, self.parent_branch, self.remote_origin_url, self.logger)
         self.logger.fatal('%s is not a supported service [%s]' % (self.service_url, GIT_SERVICES))
 
 
@@ -93,11 +97,12 @@ class GitServiceManager(object):
 
         params = {}
         if self.git_service_engine.SERVICE_NAME == 'github':
-            params = {'message': self._get_last_commit_msg(), 'remote_url': self.remote_origin_url, 'api_token': token}
+            params = {'message': self._get_last_commit_msg(), 'api_token': token}
         elif self.git_service_engine.SERVICE_NAME == 'gitlab':
             params = {'stuff': 'here'} 
 
-        self.git_service_engine.issue_pull_request(params)
+        url = self.git_service_engine.issue_pull_request(params)
+        self.logger.info(url)
 
 
     def _run_cmd(self, cmd):
