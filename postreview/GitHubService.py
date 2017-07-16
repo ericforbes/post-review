@@ -31,10 +31,7 @@ class GitHubService(BaseService):
             'head': self.source_branch,
             'base': self.parent_branch
         }
-        #/repos/:owner/:repo/pulls
-        #"Authorization: token OAUTH-TOKEN"
-        # TODO  before EVERY REQUEST... BEFORE!!.. check if current API key is valid. add a @handler at top to do this.
-        #  for example. i run this tool and it creates the key. i go into github and delete it. 
+
         url = urljoin(self.API, 'repos/%s/%s/pulls' % (owner, project_name))
         headers = {"Authorization": "token %s" % api_token}
         res = {}
@@ -62,7 +59,7 @@ class GitHubService(BaseService):
             sys.exit()
         elif res.status_code == 201:
             try:
-                pr_href = json_response['html']['href']
+                pr_href = json_response["_links"]["html"]["href"]
             except:
                 pr_href = "Merge request succeeded, but no URL was returned."
 
@@ -90,7 +87,7 @@ class GitHubService(BaseService):
         project_name = match_str[1]
         return (owner, project_name)
 
-    def _request_token(self, user, pw):
+    def _request_token(self, user, pw, try_again=None):
         url = urljoin(self.API, 'authorizations/clients/%s' % self.CLIENT_ID)
         #TODO: Add Fingerprint
         params = {
@@ -111,13 +108,12 @@ class GitHubService(BaseService):
             msg = j.get('message', 'UNDEFINED ERROR (no error description from server)')
             self.logger.error("Fatal: Could not request API token      Reason: %s " % msg)
             sys.exit()
-        if not j['token'] and j['hashed_token']: #TODO: token is not in config, but its created. so its lost in the ether, create a new one
-            #TODO: Will need to delete current token, then re-request. Make sure no infinite loop occurs.
-            self.logger.fatal('Fatal: Please revoke the token then re-run cmd: https://github.com/settings/applications')
+        if not j['token'] and j['hashed_token']: #TODO: token is not in config, but its created. so its lost in the ether
+            self.logger.fatal('Fatal: Token lost in ether. Please revoke the token then re-run cmd: https://github.com/settings/applications')
+            sys.exit()
         elif j['token']:
             self.api_token = j['token']
             return j['token']
         else:
             self.logger.fatal('Fatal: Eronious error fetching github credentials')
-
-        #print j['token']
+            sys.exit()

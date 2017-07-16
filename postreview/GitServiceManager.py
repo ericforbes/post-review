@@ -34,7 +34,7 @@ class GitServiceManager(object):
     def _get_set_api_token(self):
         #Get API token
         key = self._run_cmd("git config %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
-        if not key:
+        if (not key) or (key == "None"):
             self.logger.info("(One Time Setup) Please enter credentials to request API key")
             user = raw_input("%s username: " % self.git_service_engine.SERVICE_NAME)
             pw = getpass.getpass("%s password: " % self.git_service_engine.SERVICE_NAME)
