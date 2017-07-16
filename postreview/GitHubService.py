@@ -17,14 +17,13 @@ class GitHubService(BaseService):
     def issue_pull_request(self, obj):
 
         try:
-            remote_url = obj['remote_url']
             merge_message = obj['message']
             api_token = obj['api_token']
         except KeyError:
             self.logger.fatal("GitHubService::issue_pull_request has incorrect parameters @%s" % obj)
             sys.exit()
 
-        owner, project_name = self._repo_information(remote_url)
+        owner, project_name = self._repo_information()
 
         params = {
             'title': merge_message,
@@ -55,22 +54,22 @@ class GitHubService(BaseService):
             except:
                 err_msg = ''
 
-            self.logger.fatal("Error: Could not create merge request, %s: %s" % (json_response['message'], err_msg))
-            sys.exit()
+            return "Error: Could not create merge request, %s: %s" % (json_response['message'], err_msg)
+
         elif res.status_code == 201:
             try:
                 pr_href = json_response["_links"]["html"]["href"]
             except:
                 pr_href = "Merge request succeeded, but no URL was returned."
 
-            self.logger.info(pr_href)
+            return pr_href
         else:
-            self.logger.info(json_response)
+            return json_response
 
 
-    def _repo_information(self, remote_origin):
+    def _repo_information(self):
         match_str = ""
-        matchObj = re.search(r'git@github.com:(?P<ssh_owner_project>.*)\.git|https://github.com/(?P<https_owner_project>.*)\.git', remote_origin)
+        matchObj = re.search(r'git@github.com:(?P<ssh_owner_project>.*)\.git|https://github.com/(?P<https_owner_project>.*)\.git', self.remote_origin_url)
         if matchObj.group('ssh_owner_project'):
             match_str = matchObj.group('ssh_owner_project').split("/")
         elif matchObj.group('https_owner_project'):
@@ -87,7 +86,7 @@ class GitHubService(BaseService):
         project_name = match_str[1]
         return (owner, project_name)
 
-    def _request_token(self, user, pw, try_again=None):
+    def _request_token(self, user, pw):
         url = urljoin(self.API, 'authorizations/clients/%s' % self.CLIENT_ID)
         #TODO: Add Fingerprint
         params = {
@@ -103,17 +102,15 @@ class GitHubService(BaseService):
             )
 
         j = json.loads(res.text)
-
+        print(j)
         if res.status_code >= 400:
-            msg = j.get('message', 'UNDEFINED ERROR (no error description from server)')
-            self.logger.error("Fatal: Could not request API token      Reason: %s " % msg)
-            sys.exit()
-        if not j['token'] and j['hashed_token']: #TODO: token is not in config, but its created. so its lost in the ether
-            self.logger.fatal('Fatal: Token lost in ether. Please revoke the token then re-run cmd: https://github.com/settings/applications')
-            sys.exit()
-        elif j['token']:
-            self.api_token = j['token']
-            return j['token']
+            return (-1, j.get('message', 'UNDEFINED ERROR (no error description from server)'))
         else:
-            self.logger.fatal('Fatal: Eronious error fetching github credentials')
-            sys.exit()
+            try:
+                if not j['token'] and j['hashed_token']:
+                    #TODO: token is not in config, but its created. so its lost in the ether
+                    return (-1, 'Token lost in ether. Please revoke the token then re-run cmd: https://github.com/settings/applications')
+                else:
+                    return (j['token'], None)
+            except KeyError:
+                return (-1, "Successful response but unable to fetch credentials.")
