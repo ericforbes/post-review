@@ -49,7 +49,7 @@ class GitLabService(BaseService):
 
         res = requests.get(
             url,
-            headers = {"PRIVATE-TOKEN": "%s" % "a2ftiJ267x4J8zrTSPtN"}
+            headers = {"PRIVATE-TOKEN": "%s" % "ACCESS_TOKEN_HERE"}
             )
         j = json.loads(res.text)
         print(j)

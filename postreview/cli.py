@@ -22,8 +22,12 @@ class CliDriver(object):
 
         parser = self._create_parser()
         parsed, remaining = parser.parse_known_args(args)
-
-        if not parsed.parent:
+        print parsed
+        try:
+            if parsed.target is None:
+                raise ValueError()
+            self.target = parsed.target
+        except (AttributeError, ValueError):
             sys.stderr.write("===================================")
             sys.stderr.write("\n")
             sys.stderr.write("WARNING: missing --parent argument")
@@ -32,10 +36,9 @@ class CliDriver(object):
             sys.stderr.write("\n\n")
             parser.print_help()
             return 255
-        else:
-            self.parent = parsed.parent
-            git_service = GitServiceManager(self.parent)
-            #return git_service.post_review()
+
+        git_service = GitServiceManager(self.target)
+        # return git_service.post_review()
 
 
     def _create_parser(self):
