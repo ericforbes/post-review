@@ -16,17 +16,18 @@ def main():
 class CliDriver(object):
 
     def main(self, args=None):
-        print "dsfasd"
 
         if args is None:
             args = sys.argv[1:]
 
-
         parser = self._create_parser()
         parsed, remaining = parser.parse_known_args(args)
         print parsed
-        print remaining
-        if not parsed.parent:
+        try:
+            if parsed.target is None:
+                raise ValueError()
+            self.target = parsed.target
+        except (AttributeError, ValueError):
             sys.stderr.write("===================================")
             sys.stderr.write("\n")
             sys.stderr.write("WARNING: missing --parent argument")
@@ -35,10 +36,9 @@ class CliDriver(object):
             sys.stderr.write("\n\n")
             parser.print_help()
             return 255
-        else:
-            self.parent = parsed.parent
-            git_service = GitServiceManager(self.parent)
-            return git_service.post_review()
+
+        git_service = GitServiceManager(self.target)
+        # return git_service.post_review()
 
 
     def _create_parser(self):
@@ -46,6 +46,6 @@ class CliDriver(object):
         #parser._action_groups.pop()
         required = parser.add_argument_group('Required Arguments')
         #optional = parser.add_argument_group('Optional Arguments')
-        required.add_argument('--parent', '-p', help='remote branch to diff/merge with.')
+        required.add_argument('--target', '-t', help='remote branch to diff/merge with.')
         #optional.add_argument('--new-remote', help='remote branch to push your local changes to. Default=current_branch_name')
         return parser

@@ -23,15 +23,13 @@ class GitHubService(BaseService):
             self.logger.fatal("GitHubService::issue_pull_request has incorrect parameters @%s" % obj)
             sys.exit()
 
-        owner, project_name = self._repo_information()
-
         params = {
             'title': merge_message,
             'head': self.source_branch,
             'base': self.parent_branch
         }
 
-        url = urljoin(self.API, 'repos/%s/%s/pulls' % (owner, project_name))
+        url = urljoin(self.API, 'repos/%s/%s/pulls' % (self.namespace, self.project))
         headers = {"Authorization": "token %s" % api_token}
         res = {}
 
@@ -66,25 +64,6 @@ class GitHubService(BaseService):
         else:
             return json_response
 
-
-    def _repo_information(self):
-        match_str = ""
-        matchObj = re.search(r'git@github.com:(?P<ssh_owner_project>.*)\.git|https://github.com/(?P<https_owner_project>.*)\.git', self.remote_origin_url)
-        if matchObj.group('ssh_owner_project'):
-            match_str = matchObj.group('ssh_owner_project').split("/")
-        elif matchObj.group('https_owner_project'):
-            match_str = matchObj.group('https_owner_project').split("/")
-        else:
-            self.logger.error("Error: Unable to determine owner of GitHub repository")
-            sys.exit()
-
-        if not match_str[0] and not match_str[1]:
-            self.logger.error("Error: Unable to find both owner and project from giturl")
-            sys.exit()
-
-        owner = match_str[0]
-        project_name = match_str[1]
-        return (owner, project_name)
 
     def _request_token(self, user, pw):
         url = urljoin(self.API, 'authorizations/clients/%s' % self.CLIENT_ID)
