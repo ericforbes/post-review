@@ -26,20 +26,20 @@ class TestCliDriver(unittest.TestCase):
 
 
         driver = CliDriver()
-        rc = driver.main('--parent master'.split())
+        rc = driver.main('--target master'.split())
         self.assertEqual(rc, 1)
 
     def test_arg_parsing_correct(self):
         driver = CliDriver()
         parser = driver._create_parser()
-        parsed, remaining = parser.parse_known_args('--parent master'.split())
-        self.assertEqual(parsed.parent, 'master')
+        parsed, remaining = parser.parse_known_args('--target master'.split())
+        self.assertEqual(parsed.target, 'master')
         self.assertEqual(remaining, [])
 
     def test_arg_parsing_incorrect(self):
         driver = CliDriver()
         parser = driver._create_parser()
-        parsed, remaining = parser.parse_known_args('parent master'.split())
-        self.assertEqual(parsed.parent, None)
-        self.assertEqual(remaining, ['parent','master'])
+        parsed, remaining = parser.parse_known_args('target master'.split())
+        self.assertEqual(parsed.target, None)
+        self.assertEqual(remaining, ['target','master'])
 
