@@ -91,7 +91,7 @@ class GitHubService(BaseService):
         return (user, pw)
 
     def _setup_token(self):
-        u,p = self._req_user_pass()
+        u, p = self._req_user_pass()
         url = urljoin(self.API, 'authorizations/clients/%s' % self.CLIENT_ID)
         #TODO: Add Fingerprint
         params = {
