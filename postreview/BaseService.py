@@ -9,18 +9,24 @@ class BaseService(object):
     GIT_CONFIG_API_KEY = None
     API = None
 
-    def __init__(self, source, parent, logger):
+    def __init__(self, source, parent, origin_domain, namespace, project, logger):
         self.source_branch = source
         self.parent_branch = parent
+        self.origin_domain = origin_domain
+        self.namespace = namespace
+        self.project = project
         self.logger = logger
 
     __metaclass__ = Meta
 
 
-    def issue_pull_request(self):
+    def issue_pull_request(self, obj):
         raise NotImplementedError()
 
-    def _request_token(self, u, p):
+    def _setup_token(self):
+        raise NotImplementedError()
+
+    def parent_branch_exists(self):
         raise NotImplementedError()
 
     @classmethod
