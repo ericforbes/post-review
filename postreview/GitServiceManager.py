@@ -2,12 +2,12 @@ from GitHubService import GitHubService
 from GitLabService import GitLabService
 from GitCommandRunner import GitCommandRunner as Git
 from configprocesser import get_configuration
-import re
-import sys
 from logger import create_logger
 
+import re
+import sys
+
 #required depedendies
-from requests.auth import HTTPBasicAuth
 import requests
 from urlparse import urlparse
 

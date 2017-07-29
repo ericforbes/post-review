@@ -1,11 +1,12 @@
 from BaseService import BaseService
+
 import sys
+import json
+import re
 
 #Dependencies
 from urlparse import urljoin
 import requests #pip based
-import json
-import re
 import getpass
 
 class GitHubService(BaseService):

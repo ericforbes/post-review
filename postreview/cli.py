@@ -1,11 +1,10 @@
-from ConfigParser import SafeConfigParser
 from configprocesser import get_configuration
 from GitCommandRunner import GitCommandRunner as Git
+from GitServiceManager import GitServiceManager
+
 import argparse
 import sys
 import os
-from configprocesser import get_user_setting, get_endpoint
-from GitServiceManager import GitServiceManager
 
 def main():
     driver = CliDriver()

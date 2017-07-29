@@ -1,10 +1,13 @@
 from BaseService import BaseService
 
+import json
+import sys
+
+#required
 from urlparse import urljoin
 from urllib import quote
 import requests
-import json
-import sys
+
 
 class GitLabService(BaseService):
     SERVICE_NAME = "gitlab"
