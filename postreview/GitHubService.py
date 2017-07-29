@@ -1,16 +1,16 @@
 from BaseService import BaseService
+
 import sys
+import json
+import re
 
 #Dependencies
 from urlparse import urljoin
 import requests #pip based
-import json
-import re
 import getpass
 
 class GitHubService(BaseService):
     SERVICE_NAME = "github"
-    GIT_CONFIG_API_KEY = "postreview.github.token"
     API = "https://api.github.com"
     CLIENT_ID = '40435bdcc83a625b6c9b'
     CLIENT_SECRET = '81703a26b85a31127071c6bbbc54ac37ea970df3'
@@ -71,7 +71,7 @@ class GitHubService(BaseService):
                 err_msg = json_response['message']
             except:
                 err_msg = ''
-            return ("Error: Could not create merge request. %s %s" % (err_msg, detailed_err_msg), res.status_code)
+            return ("Error: Could not create merge request. %s. %s" % (err_msg, detailed_err_msg), res.status_code)
 
         elif res.status_code == 201:
             try:
@@ -85,7 +85,7 @@ class GitHubService(BaseService):
 
 
     def _req_user_pass(self):
-        self.logger.info("(One Time Setup) Please enter credentials to request API key")
+        self.logger.info("\n\n(One Time Setup) Please enter credentials to request API key")
         user = raw_input("%s username: " % self.SERVICE_NAME)
         pw = getpass.getpass("%s password: " % self.SERVICE_NAME)
         return (user, pw)

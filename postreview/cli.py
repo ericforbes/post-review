@@ -1,13 +1,10 @@
-from ConfigParser import SafeConfigParser
+from configprocesser import get_configuration
+from GitCommandRunner import GitCommandRunner as Git
+from GitServiceManager import GitServiceManager
+
 import argparse
 import sys
 import os
-from config import setup
-from configprocesser import get_user_setting, get_endpoint
-from GitServiceManager import GitServiceManager
-
-def SetupConfiguration():
-    setup()
 
 def main():
     driver = CliDriver()
@@ -29,7 +26,7 @@ class CliDriver(object):
         except (AttributeError, ValueError):
             sys.stderr.write("===================================")
             sys.stderr.write("\n")
-            sys.stderr.write("WARNING: missing --parent argument")
+            sys.stderr.write("WARNING: missing --target argument")
             sys.stderr.write("\n")
             sys.stderr.write("===================================")
             sys.stderr.write("\n\n")
@@ -44,7 +41,5 @@ class CliDriver(object):
         parser = argparse.ArgumentParser(description="create a code review and merge request")
         #parser._action_groups.pop()
         required = parser.add_argument_group('Required Arguments')
-        #optional = parser.add_argument_group('Optional Arguments')
         required.add_argument('--target', '-t', help='remote branch to diff/merge with.')
-        #optional.add_argument('--new-remote', help='remote branch to push your local changes to. Default=current_branch_name')
         return parser
