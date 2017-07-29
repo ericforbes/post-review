@@ -20,10 +20,13 @@ class BaseService(object):
     __metaclass__ = Meta
 
 
-    def issue_pull_request(self):
+    def issue_pull_request(self, obj):
         raise NotImplementedError()
 
-    def _request_token(self, u, p):
+    def _setup_token(self):
+        raise NotImplementedError()
+
+    def parent_branch_exists(self):
         raise NotImplementedError()
 
     @classmethod
