@@ -8,7 +8,6 @@ from logger import create_logger
 #required depedendies
 from requests.auth import HTTPBasicAuth
 import requests
-import getpass
 from urlparse import urlparse
 
 class GitServiceManager(object):
@@ -29,8 +28,6 @@ class GitServiceManager(object):
             sys.exit()
 
         git_domain_url = self._determine_git_domain()
-        print(git_domain_url)
-        print("domain")
         if not git_domain_url:
             self.logger.fatal("Unable to determine git hosting service: %s" % self.remote_origin_url)
             self.logger.fatal("Are you using a relative URL path instead of a (sub)domain?")
@@ -48,6 +45,7 @@ class GitServiceManager(object):
     def _get_last_commit_msg(self):
         return self._run_cmd("git log -1 --pretty=%B").strip()
 
+
     def _inside_working_tree(self):
         in_git_tree = self._run_cmd("git rev-parse --is-inside-work-tree").strip()
         if in_git_tree == 'true':
@@ -59,18 +57,22 @@ class GitServiceManager(object):
         #Get API token
         key = self._run_cmd("git config %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
         if (not key) or (key == "None"):
-            self.logger.info("(One Time Setup) Please enter credentials to request API key")
-            user = raw_input("%s username: " % self.git_service_engine.SERVICE_NAME)
-            pw = getpass.getpass("%s password: " % self.git_service_engine.SERVICE_NAME)
-            key, err = self.git_service_engine._request_token(user, pw)
+            key, err = self.git_service_engine._setup_token()
 
             if (key == -1):
-                self.logger.fatal('Could not request token. Please try again')
+                if (err):
+                    self.logger.fatal(err)
+                else:
+                    self.logger.fatal('Could not request token. Please try again')
                 sys.exit()
 
             self._run_cmd("git config %s %s" % (self.git_service_engine.GIT_CONFIG_API_KEY, key))
 
         return key
+
+
+    def _remove_api_token(self):
+        return self._run_cmd("git config --unset %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
 
 
     def _push_branch_to_remote(self):
@@ -100,7 +102,6 @@ class GitServiceManager(object):
 
         #HTTPS URLS
         url = urlparse(self.remote_origin_url)
-        print url
         if url.netloc:
             return url.netloc
 
@@ -133,18 +134,22 @@ class GitServiceManager(object):
 
 
     def post_review(self):
-
         self._push_branch_to_remote()
         token = self._get_set_api_token()
 
-        params = {}
-        if self.git_service_engine.SERVICE_NAME == 'github':
-            params = {'message': self._get_last_commit_msg(), 'api_token': token}
-        elif self.git_service_engine.SERVICE_NAME == 'gitlab':
-            params = {'stuff': 'here'} 
+        if not self.git_service_engine.parent_branch_exists():
+            self.logger.fatal("Target branch does not exist. Please try again")
+            sys.exit()
 
-        url = self.git_service_engine.issue_pull_request(params)
-        self.logger.info(url)
+        params = {'message': self._get_last_commit_msg(), 'api_token': token}
+
+        (msg, error) = self.git_service_engine.issue_pull_request(params)
+        if error == 401:
+            self._remove_api_token()
+            self.logger.fatal("API token is invalid. Please try again to create a new token")
+            sys.exit()
+
+        self.logger.info(msg)
 
 
     def _run_cmd(self, cmd):

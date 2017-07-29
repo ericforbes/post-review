@@ -22,7 +22,6 @@ class CliDriver(object):
 
         parser = self._create_parser()
         parsed, remaining = parser.parse_known_args(args)
-        print parsed
         try:
             if parsed.target is None:
                 raise ValueError()
@@ -38,7 +37,7 @@ class CliDriver(object):
             return 255
 
         git_service = GitServiceManager(self.target)
-        # return git_service.post_review()
+        return git_service.post_review()
 
 
     def _create_parser(self):
