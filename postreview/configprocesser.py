@@ -24,28 +24,17 @@ def _fetch(section, key):
         print("%s key does not exist in config.ini" % key)
         sys.exit()
 
-def _insert(section, key, value):
-    config = SafeConfigParser()
-    config.read(_config_path())
-    config.set(section, key, value)
+#def _insert(section, key, value):
+#    config = SafeConfigParser()
+#    config.read(_config_path())
+#    config.set(section, key, value)
 
-    with open(_config_path(), 'wb') as configfile:
-        config.write(configfile)
-    return 1
+#    with open(_config_path(), 'wb') as configfile:
+#        config.write(configfile)
+#    return 1
 
-def put_config(section, key, value):
-    return _insert(section, key, value)
-
-def get_user_setting(arg):
-    return _fetch('user_settings', arg)
-
-def put_user_setting(key, value):
-    _insert('user_settings', key, value)
+#def put_config(section, key, value):
+#    return _insert(section, key, value)
 
 def get_configuration(arg):
     return _fetch('configuration', arg)
-
-def get_endpoint(type='name'):
-    service = get_user_setting('service')
-    if type == 'name': return service
-    return _fetch(service, 'url')

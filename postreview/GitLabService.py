@@ -8,7 +8,6 @@ import sys
 
 class GitLabService(BaseService):
     SERVICE_NAME = "gitlab"
-    GIT_CONFIG_API_KEY = "postreview.gitlab.key"
 
     def _API(self):
         return urljoin('https://%s/' % self.origin_domain, 'api/v4/')
@@ -63,7 +62,7 @@ class GitLabService(BaseService):
             return (None, res.status_code)
         elif res.status_code >= 400:
             try:
-                err_msg = json_response['message']
+                err_msg = str(json_response['message'][0])
             except:
                 err_msg = ''
             return ("Error: Could not create merge request %s" % (err_msg), res.status_code)
@@ -85,7 +84,7 @@ class GitLabService(BaseService):
 
 
     def _setup_token(self):
-        self.logger.info("(One Time Setup) Please create a Personal Access Token")
+        self.logger.info("\n\n(One Time Setup) Please create a Personal Access Token")
         self.logger.info("https://%s/profile/personal_access_tokens" % self.origin_domain)
         self.logger.info("Scope: API, Expires: Never\n")
         token = raw_input("Please enter your Personal Access Token:  ")

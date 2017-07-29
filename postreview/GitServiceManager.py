@@ -1,6 +1,7 @@
 from GitHubService import GitHubService
 from GitLabService import GitLabService
-import subprocess
+from GitCommandRunner import GitCommandRunner as Git
+from configprocesser import get_configuration
 import re
 import sys
 from logger import create_logger
@@ -15,12 +16,13 @@ class GitServiceManager(object):
 
     def __init__(self, target_branch):
         self.logger = create_logger()
+        self.git_config_token_key = get_configuration('git_config_token_key')
 
-        if not self._inside_working_tree():
+        if not Git.inside_working_tree():
             self.logger.error("you are not in a working git directory. please navigate to your current project")
             sys.exit()
 
-        self.source_branch = self._determine_current_branch()
+        self.source_branch = Git.get_current_branch()
         self.parent_branch = target_branch
 
         if self.parent_branch == self.source_branch:
@@ -42,63 +44,29 @@ class GitServiceManager(object):
         self._get_set_api_token()
 
 
-    def _get_last_commit_msg(self):
-        return self._run_cmd("git log -1 --pretty=%B").strip()
-
-
-    def _inside_working_tree(self):
-        in_git_tree = self._run_cmd("git rev-parse --is-inside-work-tree").strip()
-        if in_git_tree == 'true':
-            return True
-        return False
-
-
     def _get_set_api_token(self):
         #Get API token
-        key = self._run_cmd("git config %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
-        if (not key) or (key == "None"):
-            key, err = self.git_service_engine._setup_token()
+        val = Git.get_api_token(self.git_config_token_key)
+        if (not val) or (val == "None"):
+            val, err = self.git_service_engine._setup_token()
 
-            if (key == -1):
+            if (val== -1):
                 if (err):
                     self.logger.fatal(err)
                 else:
                     self.logger.fatal('Could not request token. Please try again')
                 sys.exit()
 
-            self._run_cmd("git config %s %s" % (self.git_service_engine.GIT_CONFIG_API_KEY, key))
+            Git.add_api_token(self.git_config_token_key, val)
 
-        return key
+        return val
 
-
-    def _remove_api_token(self):
-        return self._run_cmd("git config --unset %s" % self.git_service_engine.GIT_CONFIG_API_KEY).strip()
-
-
-    def _push_branch_to_remote(self):
-        cmd = "git push origin HEAD:%s" % self.source_branch
-        u = raw_input("\n\nPushing local branch [%s] to remote [%s]:  Yes or no? " % (self.source_branch, self.source_branch))
-        if u.lower() != 'yes' and u.lower() != 'y':
-            self.logger.info("Exiting..")
-            sys.exit()
-
-        output = self._run_cmd(cmd)
-        self.logger.info(output)
-
-
-    def _determine_current_branch(self):
-        branch = self._run_cmd("git rev-parse --abbrev-ref HEAD").rstrip()
-        if not branch:
-            self.logger.fatal("Unable to determine current git branch: git rev-parse --abbrev-ref HEAD")
-            sys.exit()
-
-        return branch
 
 
     def _determine_git_domain(self):
         #Handles both SSH and HTTPS
         #No support for relative URL path, only (sub)domain: https://docs.gitlab.com/omnibus/settings/configuration.html
-        self.remote_origin_url = self._run_cmd("git config --get remote.origin.url").rstrip()
+        self.remote_origin_url = Git.get_remote_origin_url()
 
         #HTTPS URLS
         url = urlparse(self.remote_origin_url)
@@ -134,40 +102,19 @@ class GitServiceManager(object):
 
 
     def post_review(self):
-        self._push_branch_to_remote()
+        Git.push_branch_to_remote(self.source_branch)
         token = self._get_set_api_token()
 
         if not self.git_service_engine.parent_branch_exists():
             self.logger.fatal("Target branch does not exist. Please try again")
             sys.exit()
 
-        params = {'message': self._get_last_commit_msg(), 'api_token': token}
+        params = {'message': Git.get_last_commit_msg(), 'api_token': token}
 
         (msg, error) = self.git_service_engine.issue_pull_request(params)
         if error == 401:
-            self._remove_api_token()
+            Git.remove_api_token(self.git_config_token_key)
             self.logger.fatal("API token is invalid. Please try again to create a new token")
             sys.exit()
 
         self.logger.info(msg)
-
-
-    def _run_cmd(self, cmd):
-        cmd_list = cmd.split()
-        try:
-            p = subprocess.Popen(
-            cmd_list,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-            output = p.communicate()
-
-            if not output[0]:
-                return output[1]
-            return output[0]
-
-        except OSError as e:
-            self.logger.fatal("Fatal: '%s' is either not in your path or is not installed" % cmd_list[0])
-            sys.exit()
-        except IndexError as e:
-            self.logger.error("Error: Unexpected response from `%s`" % cmd)
-            sys.exit()
