@@ -1,4 +1,5 @@
-from logger import create_logger
+from __future__ import absolute_import
+from .logger import create_logger
 
 class Meta(type):
     def __str__(self):

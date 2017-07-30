@@ -1,4 +1,5 @@
-from BaseService import BaseService
+from __future__ import absolute_import
+from .BaseService import BaseService
 
 import sys
 import json

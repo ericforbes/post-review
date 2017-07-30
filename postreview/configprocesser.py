@@ -1,3 +1,4 @@
+from __future__ import print_function
 from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
 import sys
 import os
