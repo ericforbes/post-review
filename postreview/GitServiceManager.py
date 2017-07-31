@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+from builtins import object
 from .GitHubService import GitHubService
 from .GitLabService import GitLabService
 from .GitCommandRunner import GitCommandRunner as Git

@@ -1,7 +1,9 @@
+from builtins import input
+from builtins import object
 import subprocess
 import sys
 
-class GitCommandRunner():
+class GitCommandRunner(object):
 
     @staticmethod
     def remove_api_token(config_key):
@@ -42,7 +44,7 @@ class GitCommandRunner():
     @staticmethod
     def push_branch_to_remote(source):
         cmd = "git push origin HEAD:%s" % source
-        u = raw_input("\n\nPushing local branch [%s] to remote [%s],  Yes or no? " % (source, source))
+        u = eval(input("\n\nPushing local branch [%s] to remote [%s],  Yes or no? " % (source, source)))
         if u.lower() != 'yes' and u.lower() != 'y':
             sys.stderr.write("Exiting...\n")
             sys.exit()

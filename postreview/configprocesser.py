@@ -1,5 +1,7 @@
 from __future__ import print_function
-from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
+from future import standard_library
+standard_library.install_aliases()
+from configparser import SafeConfigParser, NoSectionError, NoOptionError
 import sys
 import os
 

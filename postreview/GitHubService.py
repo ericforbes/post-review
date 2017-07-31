@@ -1,4 +1,7 @@
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
 from .BaseService import BaseService
 
 import sys
@@ -6,8 +9,8 @@ import json
 import re
 
 #Dependencies
-from urlparse import urljoin
-import requests #pip based
+from urllib.parse import urljoin
+import requests
 import getpass
 
 class GitHubService(BaseService):
@@ -87,7 +90,7 @@ class GitHubService(BaseService):
 
     def _req_user_pass(self):
         self.logger.info("\n\n(One Time Setup) Please enter credentials to request API key")
-        user = raw_input("%s username: " % self.SERVICE_NAME)
+        user = eval(input("%s username: " % self.SERVICE_NAME))
         pw = getpass.getpass("%s password: " % self.SERVICE_NAME)
         return (user, pw)
 

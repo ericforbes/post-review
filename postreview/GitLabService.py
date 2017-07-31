@@ -1,12 +1,16 @@
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import input
+from builtins import str
 from .BaseService import BaseService
 
 import json
 import sys
 
 #required
-from urlparse import urljoin
-from urllib import quote
+from urllib.parse import urljoin
+from urllib.parse import quote
 import requests
 
 
@@ -91,7 +95,7 @@ class GitLabService(BaseService):
         self.logger.info("\n\n(One Time Setup) Please create a Personal Access Token")
         self.logger.info("https://%s/profile/personal_access_tokens" % self.origin_domain)
         self.logger.info("Scope: API, Expires: Never\n")
-        token = raw_input("Please enter your Personal Access Token:  ")
+        token = eval(input("Please enter your Personal Access Token:  "))
 
         # Make request to resource that requires us to be authenticated
         url = urljoin(self._API(), 'projects/%s/deploy_keys' % self._url_encoded_path())
