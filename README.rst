@@ -15,6 +15,12 @@ The post-review package works on Python versions:
 * 3.3.x and greater
 
 
+The post-review package works with these services:
+
+* GitHub Hosted
+* GitLab Hosted
+* GitLab CE, EES, EEP
+
 
 ------------
 Installation
