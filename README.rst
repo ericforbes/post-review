@@ -20,7 +20,7 @@ The post-review package works on Python versions:
 Installation
 ------------
 
-The easiest way to install post-review is to use `pip`_::
+The easiest way to install post-review is to use `pip <https://pip.pypa.io/en/latest/installing/>`_::
 
     $ pip install post-review
 
