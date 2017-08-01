@@ -7,7 +7,7 @@ post-review
    :alt: Build Status
 
 
-This package provies a unified command line interface to posting code reviews and merge requests
+This package provied a unified command line interface for posting code reviews and merge requests
 
 The post-review package works on Python versions:
 
