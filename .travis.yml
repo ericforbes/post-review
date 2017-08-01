@@ -5,11 +5,10 @@ python:
     - "3.6"
 
 before_install:
-    - if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
-        echo "No pull requests can be sent to the master branch" 1>&2;
+    - if [ "$TRAVIS_PULL_REQUEST" != "false" ] && [ "$TRAVIS_BRANCH" == "master" ] && [ "$TRAVIS_PULL_REQUEST_BRANCH" != "develop" ]; then
+        echo "Pull requests to Master branch can only originate from the develop branch" 1>&2;
         exit 1;
       fi
-    - pip install codecov
 
 install:
     - python scripts/install
