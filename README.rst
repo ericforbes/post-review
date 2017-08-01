@@ -25,7 +25,7 @@ The easiest way to install post-review is to use `pip`_::
     $ pip install post-review
 
 
-If you already have post-review installed and want to upgrade to the latest version:
+If you already have post-review installed and want to upgrade to the latest version::
 
     $ pip install --upgrade post-review
 
@@ -44,7 +44,7 @@ The quickest way to get started is to just run the ``post-review`` command::
     $ post-review --target <target_branch>
 
 
-Assuming you are using GitLab Hosted, this is what you will see for your one time setup:
+Assuming you are using GitLab Hosted, this is what you will see for your one time setup::
 
     $ post-review --target <target_branch>
 
@@ -53,14 +53,3 @@ Assuming you are using GitLab Hosted, this is what you will see for your one tim
     Scope: API, Expires: Never
 
     Please enter your Personal Access Token: <paste_your_token_here>
-    ...
-    ...
-
-
-
-
-
-
-tox (run tests)
-
-usage: python post-review --target [remote_branch_to_merge_with]
