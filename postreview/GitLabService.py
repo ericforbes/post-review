@@ -18,7 +18,9 @@ class GitLabService(BaseService):
     SERVICE_NAME = "gitlab"
 
     def _API(self):
-        return urljoin('https://%s/' % self.origin_domain, 'api/v4/')
+        url = 'https://%s/' % self.origin_domain
+        path = 'api/v4/'
+        return urljoin(str(url), str(path))
 
 
     def parent_branch_exists(self):
@@ -50,7 +52,8 @@ class GitLabService(BaseService):
             'title': merge_message
         }
 
-        url = urljoin(self._API(), 'projects/%s/merge_requests' % self._url_encoded_path())
+        path = 'projects/%s/merge_requests' % self._url_encoded_path()
+        url = urljoin(str(self._API()), str(path))
         headers = {"PRIVATE-TOKEN": api_token}
         res = {}
 
@@ -73,7 +76,7 @@ class GitLabService(BaseService):
                 err_msg = str(json_response['message'][0])
             except:
                 err_msg = ''
-            return ("Error: Could not create merge request %s" % (err_msg), res.status_code)
+            return ("Could not create merge request %s" % (err_msg), res.status_code)
 
         elif res.status_code == 201:
             try:
@@ -98,7 +101,8 @@ class GitLabService(BaseService):
         token = eval(input("Please enter your Personal Access Token:  "))
 
         # Make request to resource that requires us to be authenticated
-        url = urljoin(self._API(), 'projects/%s/deploy_keys' % self._url_encoded_path())
+        path = 'projects/%s/deploy_keys' % self._url_encoded_path()
+        url = urljoin(str(self._API()), path)
 
         res = requests.get(
             url,

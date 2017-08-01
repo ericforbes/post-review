@@ -2,6 +2,9 @@ from builtins import input
 from builtins import object
 import subprocess
 import sys
+from .logger import create_logger
+
+logger = create_logger()
 
 class GitCommandRunner(object):
 
@@ -31,8 +34,9 @@ class GitCommandRunner(object):
     @staticmethod
     def get_current_branch():
         branch = run_cmd("git rev-parse --abbrev-ref HEAD").rstrip()
+        print(branch)
         if 'fatal: Not a git repository' in branch:
-            sys.stderr.write("Unable to determine current git branch: git rev-parse --abbrev-ref HEAD\n")
+            logger.fatal("Unable to determine current git branch: git rev-parse --abbrev-ref HEAD\n")
             sys.exit()
 
         return branch
@@ -44,14 +48,13 @@ class GitCommandRunner(object):
     @staticmethod
     def push_branch_to_remote(source):
         cmd = "git push origin HEAD:%s" % source
-        u = eval(input("\n\nPushing local branch [%s] to remote [%s],  Yes or no? " % (source, source)))
+        u = input("\n\nPushing local branch [%s] to remote [%s],  Yes or no? " % (source, source))
         if u.lower() != 'yes' and u.lower() != 'y':
-            sys.stderr.write("Exiting...\n")
+            logger.info("Exiting...\n")
             sys.exit()
 
         output = run_cmd(cmd)
-        sys.stderr.write(output)
-        sys.stderr.write("\n")
+        logger.info(output)
 
 def run_cmd(cmd):
     cmd_list = cmd.split()
@@ -62,13 +65,14 @@ def run_cmd(cmd):
         stderr=subprocess.PIPE)
         output = p.communicate()
 
+        # decode() required for python3 compatability
         if not output[0]:
-            return output[1]
-        return output[0]
+            return output[1].decode()
+        return output[0].decode()
 
     except OSError as e:
-        sys.stderr.write("Fatal: '%s' is either not in your path or is not installed\n" % cmd_list[0])
+        logger.fatal("'%s' is either not in your path or is not installed\n" % cmd_list[0])
         sys.exit()
     except IndexError as e:
-        sys.stderr.write("Error: Unexpected response from `%s`\n" % cmd)
+        logger.fatal("Unexpected response from `%s`\n" % cmd)
         sys.exit()

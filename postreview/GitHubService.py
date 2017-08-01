@@ -20,7 +20,8 @@ class GitHubService(BaseService):
     CLIENT_SECRET = '81703a26b85a31127071c6bbbc54ac37ea970df3'
 
     def parent_branch_exists(self):
-        url = urljoin(self.API, '/repos/%s/%s/branches/%s' % (self.namespace, self.project, self.parent_branch))
+        path = '/repos/%s/%s/branches/%s' % (self.namespace, self.project, self.parent_branch)
+        url = urljoin(str(self.API), str(path))
         try:
             res = requests.get(url)
         except Exception as e:
@@ -46,7 +47,8 @@ class GitHubService(BaseService):
             'base': self.parent_branch
         }
 
-        url = urljoin(self.API, 'repos/%s/%s/pulls' % (self.namespace, self.project))
+        path = 'repos/%s/%s/pulls' % (self.namespace, self.project)
+        url = urljoin(str(self.API), str(path))
         headers = {"Authorization": "token %s" % api_token}
         res = {}
 
@@ -75,7 +77,7 @@ class GitHubService(BaseService):
                 err_msg = json_response['message']
             except:
                 err_msg = ''
-            return ("Error: Could not create merge request. %s. %s" % (err_msg, detailed_err_msg), res.status_code)
+            return ("Could not create merge request. %s. %s" % (err_msg, detailed_err_msg), res.status_code)
 
         elif res.status_code == 201:
             try:

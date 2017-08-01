@@ -88,3 +88,4 @@ class GitServiceManager(object):
             sys.exit()
 
         self.logger.info(msg)
+        sys.stderr.write("\n\n")
