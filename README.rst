@@ -53,3 +53,7 @@ Assuming you are using GitLab Hosted, this is what you will see for your one tim
     Scope: API, Expires: Never
 
     Please enter your Personal Access Token: <paste_your_token_here>
+
+The above requires you to navigate to the GitLab link to create an access token.
+You will need to use the API scope and make sure that it does not expire -- or can rotate too.
+This allows grants permission for post-review to create a merge request.
