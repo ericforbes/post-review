@@ -54,29 +54,6 @@ class TestGitHubService(unittest.TestCase):
         self.assertEqual(kwargs.get('headers')['Authorization'], 'token %s' % api_token)
 
 
-    @mock.patch("postreview.GitHubService.requests.put")
-    @mock.patch("postreview.GitHubService.GitHubService._req_user_pass")
-    def test_github_fetch_token(self, fetch_credentials, mock_request):
-        username = "frank"
-        pw = "bigg13123"
-        mock_request.side_effect = [mock.MagicMock(status_code=201, headers={'content-type':"application/json"},
-                         text=json.dumps({'token':'1231100343-413-134'}))]
-        fetch_credentials.side_effect = [(username,pw)]
-        local = "NewFeatureBranch"
-        remote = "master"
-        service = GitHubService(local, remote, 'git@github.com:ericforbes/post-review.git', 'ericforbes', 'post-review', None)
-        key, err = service._setup_token()
-
-        args, kwargs = mock_request.call_args
-        expected_data = {'client_secret': GitHubService.CLIENT_SECRET, 'scopes': ['public_repo', 'repo'], 'note': 'post-review cli utility (github, gitlab, etc)'}
-        self.assertEqual(json.loads(kwargs.get('data'))['client_secret'], expected_data['client_secret'])
-        self.assertEqual(json.loads(kwargs.get('data'))['scopes'], expected_data['scopes'])
-        self.assertEqual(json.loads(kwargs.get('data'))['note'], expected_data['note'])
-        self.assertEqual(kwargs.get('url'), 'https://api.github.com/authorizations/clients/%s' % GitHubService.CLIENT_ID)
-        self.assertEqual(kwargs.get('auth'), (username, pw))
-
-        self.assertEqual(key, '1231100343-413-134')
-
 
 if __name__ == '__main__':
     unittest.main()
