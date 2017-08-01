@@ -54,7 +54,7 @@ class GitHubService(BaseService):
 
         try:
             res = requests.post(
-                url,
+                url=url,
                 headers = headers,
                 data = json.dumps(params)
                 )
@@ -91,8 +91,8 @@ class GitHubService(BaseService):
 
 
     def _req_user_pass(self):
-        self.logger.info("\n\n(One Time Setup) Please enter credentials to request API key")
-        user = eval(input("%s username: " % self.SERVICE_NAME))
+        self.logger.warn("\n\n(One Time Setup) Please enter credentials to request API key")
+        user = input("%s username: " % self.SERVICE_NAME)
         pw = getpass.getpass("%s password: " % self.SERVICE_NAME)
         return (user, pw)
 
@@ -107,7 +107,7 @@ class GitHubService(BaseService):
         }
 
         res = requests.put(
-            url,
+            url=url,
             auth = (u,p),
             data = json.dumps(params)
             )
