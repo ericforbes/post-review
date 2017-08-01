@@ -78,7 +78,7 @@ class GitHubService(BaseService):
             except:
                 err_msg = ''
             return ("Could not create merge request. %s. %s" % (err_msg, detailed_err_msg), res.status_code)
-BREAKCING CODE HANGE
+
 
     def _req_user_pass(self):
         self.logger.warn("\n\n(One Time Setup) Please enter credentials to request API key")
