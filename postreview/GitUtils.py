@@ -1,5 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
 import re
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 def determine_git_domain(origin_url):
         #Handles both SSH and HTTPS

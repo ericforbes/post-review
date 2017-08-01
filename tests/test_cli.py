@@ -1,5 +1,13 @@
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
 import unittest
-from mock import patch
 import postreview
 from postreview import cli
 from postreview.cli import CliDriver
@@ -18,8 +26,8 @@ class TestCliDriver(unittest.TestCase):
         rc = driver.main('parent frankenstein'.split())
         self.assertEqual(rc, 255)
 
-    @patch('postreview.GitServiceManager.GitServiceManager.__init__')
-    @patch('postreview.GitServiceManager.GitServiceManager.post_review')
+    @mock.patch('postreview.GitServiceManager.GitServiceManager.__init__')
+    @mock.patch('postreview.GitServiceManager.GitServiceManager.post_review')
     def test_functional_correct_args(self, post_review, init):
         init.return_value = None
         post_review.return_value = 1
@@ -43,3 +51,5 @@ class TestCliDriver(unittest.TestCase):
         self.assertEqual(parsed.target, None)
         self.assertEqual(remaining, ['target','master'])
 
+if __name__ == '__main__':
+    unittest.main()

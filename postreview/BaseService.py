@@ -1,10 +1,13 @@
-from logger import create_logger
+from __future__ import absolute_import
+from builtins import object
+from .logger import create_logger
+from future.utils import with_metaclass
 
 class Meta(type):
     def __str__(self):
         return self.SERVICE_NAME
 
-class BaseService(object):
+class BaseService(with_metaclass(Meta, object)):
     SERVICE_NAME = None
     GIT_CONFIG_API_KEY = None
     API = None
@@ -17,8 +20,7 @@ class BaseService(object):
         self.project = project
         self.logger = logger
 
-    __metaclass__ = Meta
-
+    
 
     def issue_pull_request(self, obj):
         raise NotImplementedError()

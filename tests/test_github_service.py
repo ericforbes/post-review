@@ -1,5 +1,10 @@
+try:
+    import mock
+except ImportError:
+    from unittest import mock
+
 import unittest
-from mock import patch, MagicMock
+
 from postreview.GitHubService import GitHubService
 import requests
 import json
@@ -15,7 +20,7 @@ sys.stderrff = open(os.devnull, 'w')
 class TestGitHubService(unittest.TestCase):
     
 
-    @patch("postreview.GitHubService.requests.post")
+    @mock.patch("postreview.GitHubService.requests.post")
     def test_github_pull_request(self, mock_requests):
         code_review_message = "my first code review"
         api_token = "1234abcd"
@@ -24,7 +29,7 @@ class TestGitHubService(unittest.TestCase):
         merge_url = "https://github.com/ericforbes/post-review/mergerequest/4"
 
         mock_requests.side_effect = [
-        MagicMock(status_code=201, headers={'content-type':"application/json"},
+        mock.MagicMock(status_code=201, headers={'content-type':"application/json"},
                          text=json.dumps(
                             {'_links':
                                 {'html':
@@ -47,12 +52,12 @@ class TestGitHubService(unittest.TestCase):
             headers={'Authorization': 'token %s' % api_token}
         )
 
-    @patch("postreview.GitHubService.requests.put")
-    @patch("postreview.GitHubService.GitHubService._req_user_pass")
+    @mock.patch("postreview.GitHubService.requests.put")
+    @mock.patch("postreview.GitHubService.GitHubService._req_user_pass")
     def test_github_fetch_token(self, fetch_credentials, mock_request):
         username = "frank"
         pw = "bigg13123"
-        mock_request.side_effect = [MagicMock(status_code=201, headers={'content-type':"application/json"},
+        mock_request.side_effect = [mock.MagicMock(status_code=201, headers={'content-type':"application/json"},
                          text=json.dumps({'token':'1231100343-413-134'}))]
         fetch_credentials.side_effect = [(username,pw)]
         local = "NewFeatureBranch"
@@ -67,3 +72,7 @@ class TestGitHubService(unittest.TestCase):
             data=json.dumps(data)
         )
         self.assertEqual(key, '1231100343-413-134')
+
+
+if __name__ == '__main__':
+    unittest.main()

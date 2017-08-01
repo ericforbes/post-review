@@ -1,5 +1,9 @@
-from ConfigParser import SafeConfigParser, NoSectionError, NoOptionError
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from configparser import SafeConfigParser, NoSectionError, NoOptionError
 import sys
+from .logger import create_logger
 import os
 
 #Get path relevant to where configprocesser.py is
@@ -17,11 +21,11 @@ def _fetch(section, key):
         return data
     except NoSectionError:
         #Logging Error
-        print("%s section does not exist in config.ini" % section)
+        logger.fatal("%s section does not exist in config.ini" % section)
         sys.exit()
     except NoOptionError:
         #TODO LOGGING ERROR
-        print("%s key does not exist in config.ini" % key)
+        logger.fatal("%s key does not exist in config.ini" % key)
         sys.exit()
 
 #def _insert(section, key, value):
