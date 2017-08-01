@@ -34,7 +34,6 @@ class GitCommandRunner(object):
     @staticmethod
     def get_current_branch():
         branch = run_cmd("git rev-parse --abbrev-ref HEAD").rstrip()
-        print(branch)
         if 'fatal: Not a git repository' in branch:
             logger.fatal("Unable to determine current git branch: git rev-parse --abbrev-ref HEAD\n")
             sys.exit()
@@ -50,11 +49,11 @@ class GitCommandRunner(object):
         cmd = "git push origin HEAD:%s" % source
         u = input("\n\nPushing local branch [%s] to remote [%s],  Yes or no? " % (source, source))
         if u.lower() != 'yes' and u.lower() != 'y':
-            logger.info("Exiting...\n")
+            logger.warn("Exiting...\n")
             sys.exit()
 
         output = run_cmd(cmd)
-        logger.info(output)
+        logger.warn(output)
 
 def run_cmd(cmd):
     cmd_list = cmd.split()

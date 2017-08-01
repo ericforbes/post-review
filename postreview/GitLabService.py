@@ -95,10 +95,10 @@ class GitLabService(BaseService):
 
 
     def _setup_token(self):
-        self.logger.info("\n\n(One Time Setup) Please create a Personal Access Token")
-        self.logger.info("https://%s/profile/personal_access_tokens" % self.origin_domain)
-        self.logger.info("Scope: API, Expires: Never\n")
-        token = eval(input("Please enter your Personal Access Token:  "))
+        self.logger.warn("\n\n(One Time Setup) Please create a Personal Access Token")
+        self.logger.warn("https://%s/profile/personal_access_tokens" % self.origin_domain)
+        self.logger.warn("Scope: API, Expires: Never\n")
+        token = input("Please enter your Personal Access Token:  ")
 
         # Make request to resource that requires us to be authenticated
         path = 'projects/%s/deploy_keys' % self._url_encoded_path()

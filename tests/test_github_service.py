@@ -13,8 +13,8 @@ import json
 import sys
 import os
 
-sys.stdoutff = open(os.devnull, 'w')
-sys.stderrff = open(os.devnull, 'w')
+#sys.stdoutff = open(os.devnull, 'w')
+#sys.stderrff = open(os.devnull, 'w')
 
 
 class TestGitHubService(unittest.TestCase):
@@ -45,12 +45,14 @@ class TestGitHubService(unittest.TestCase):
 
         self.assertEqual(msg, merge_url)
 
-        data = {"title": code_review_message, "head": local, "base": remote}
-        mock_requests.assert_called_with(
-            'https://api.github.com/repos/ericforbes/post-review/pulls',
-            data=json.dumps(data),
-            headers={'Authorization': 'token %s' % api_token}
-        )
+        args, kwargs = mock_requests.call_args
+        expected_data = {"title": code_review_message, "head": local, "base": remote}
+        self.assertEqual(json.loads(kwargs.get('data'))['title'], expected_data['title'])
+        self.assertEqual(json.loads(kwargs.get('data'))['base'], expected_data['base'])
+        self.assertEqual(json.loads(kwargs.get('data'))['head'], expected_data['head'])
+        self.assertEqual(kwargs.get('url'), 'https://api.github.com/repos/ericforbes/post-review/pulls')
+        self.assertEqual(kwargs.get('headers')['Authorization'], 'token %s' % api_token)
+
 
     @mock.patch("postreview.GitHubService.requests.put")
     @mock.patch("postreview.GitHubService.GitHubService._req_user_pass")
@@ -65,12 +67,14 @@ class TestGitHubService(unittest.TestCase):
         service = GitHubService(local, remote, 'git@github.com:ericforbes/post-review.git', 'ericforbes', 'post-review', None)
         key, err = service._setup_token()
 
-        data = {"client_secret": GitHubService.CLIENT_SECRET, "scopes": ["public_repo", "repo"], "note": "post-review cli utility (github, gitlab, etc)"}
-        mock_request.assert_called_with(
-            'https://api.github.com/authorizations/clients/40435bdcc83a625b6c9b',
-            auth=(username, pw),
-            data=json.dumps(data)
-        )
+        args, kwargs = mock_request.call_args
+        expected_data = {'client_secret': GitHubService.CLIENT_SECRET, 'scopes': ['public_repo', 'repo'], 'note': 'post-review cli utility (github, gitlab, etc)'}
+        self.assertEqual(json.loads(kwargs.get('data'))['client_secret'], expected_data['client_secret'])
+        self.assertEqual(json.loads(kwargs.get('data'))['scopes'], expected_data['scopes'])
+        self.assertEqual(json.loads(kwargs.get('data'))['note'], expected_data['note'])
+        self.assertEqual(kwargs.get('url'), 'https://api.github.com/authorizations/clients/%s' % GitHubService.CLIENT_ID)
+        self.assertEqual(kwargs.get('auth'), (username, pw))
+
         self.assertEqual(key, '1231100343-413-134')
 
 

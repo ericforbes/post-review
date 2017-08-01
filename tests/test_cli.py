@@ -16,8 +16,8 @@ from postreview.GitServiceManager import GitServiceManager
 import sys
 import os
 
-sys.stdout = open(os.devnull, 'w')
-sys.stderr = open(os.devnull, 'w')
+#sys.stdout = open(os.devnull, 'w')
+#sys.stderr = open(os.devnull, 'w')
 
 
 class TestCliDriver(unittest.TestCase):
