@@ -34,7 +34,7 @@ def find_version(*file_paths):
 
 setup_options = dict(
     name='post-review',
-    version='1.0.10',
+    version=find_version("postreview", "__init__.py"),
     description='unified command line interface for posting code reviews and merge requests',
     long_description=open('README.rst').read(),
     url='https://github.com/ericforbes/post-review',
