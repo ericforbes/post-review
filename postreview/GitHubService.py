@@ -78,17 +78,7 @@ class GitHubService(BaseService):
             except:
                 err_msg = ''
             return ("Could not create merge request. %s. %s" % (err_msg, detailed_err_msg), res.status_code)
-
-        elif res.status_code == 201:
-            try:
-                pr_href = json_response["_links"]["html"]["href"]
-            except:
-                pr_href = "Merge request succeeded, but no URL was returned."
-            return (pr_href, None)
-            
-        else:
-            return (json_response, None)
-
+BREAKCING CODE HANGE
 
     def _req_user_pass(self):
         self.logger.warn("\n\n(One Time Setup) Please enter credentials to request API key")
