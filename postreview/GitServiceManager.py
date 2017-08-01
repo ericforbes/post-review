@@ -87,4 +87,4 @@ class GitServiceManager(object):
             self.logger.fatal("API token is invalid. Please try again to create a new token")
             sys.exit()
 
-        self.logger.warn(msg)
+        self.logger.warn(msg+'\n')
