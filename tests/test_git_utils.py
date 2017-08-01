@@ -1,5 +1,6 @@
+
+
 import unittest
-from mock import patch, MagicMock
 from postreview.GitUtils import determine_git_domain, repo_url_attributes
 import requests
 import json
@@ -24,3 +25,7 @@ class TestGitUtils(unittest.TestCase):
     def test_subdomain_ssh_repo_attributes(self):
         domain = determine_git_domain('git@gitlab.company.com:ericforbes/post-review.git')
         self.assertEqual(domain, 'gitlab.company.com')
+
+
+if __name__ == '__main__':
+    unittest.main()

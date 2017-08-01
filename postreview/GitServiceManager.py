@@ -1,9 +1,11 @@
-from GitHubService import GitHubService
-from GitLabService import GitLabService
-from GitCommandRunner import GitCommandRunner as Git
-from GitUtils import determine_git_domain, repo_url_attributes
-from configprocesser import get_configuration
-from logger import create_logger
+from __future__ import absolute_import
+from builtins import object
+from .GitHubService import GitHubService
+from .GitLabService import GitLabService
+from .GitCommandRunner import GitCommandRunner as Git
+from .GitUtils import determine_git_domain, repo_url_attributes
+from .configprocesser import get_configuration
+from .logger import create_logger
 
 import sys
 
@@ -86,3 +88,4 @@ class GitServiceManager(object):
             sys.exit()
 
         self.logger.info(msg)
+        sys.stderr.write("\n\n")

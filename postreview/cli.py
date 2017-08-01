@@ -1,6 +1,8 @@
-from configprocesser import get_configuration
-from GitCommandRunner import GitCommandRunner as Git
-from GitServiceManager import GitServiceManager
+from __future__ import absolute_import
+from builtins import object
+from .configprocesser import get_configuration
+from .GitCommandRunner import GitCommandRunner as Git
+from .GitServiceManager import GitServiceManager
 
 import argparse
 import sys
