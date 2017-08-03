@@ -14,20 +14,31 @@ def determine_git_domain(origin_url):
 
         #SSH URLS
         matchObj = re.search(r'@+(?P<ssh_git_url>.*)?:', origin_url)
-        if matchObj.group('ssh_git_url'):
-            return matchObj.group('ssh_git_url')
 
-        return None
+        try:
+            if matchObj.group('ssh_git_url'):
+                return matchObj.group('ssh_git_url')
+        except:
+            return None
 
 
 def repo_url_attributes(domain, remote_origin_url):
         domain_fixed = re.escape(domain)
 
-        # git@gitlab.com:librid/my-postreview-test.git -> librid/my-postreview-test
-        # https://gitlab.com/librid/my-postreview-test.git -> librid/my-postreview-test
-        match = re.search(r'%s(:|\/)+?(.*)\.git' % domain_fixed, remote_origin_url)
+        # git@gitlab.com:ericforbes/my-postreview-test.git -> ericforbes/
+        # https://gitlab.com/ericforbes/private/my-postreview-test.git -> ericforbes/private/
+        namespace_match = re.search(r'%s(:|\/)(?P<namespace>.*\/)' % domain_fixed, remote_origin_url)
+
+        # git@gitlab.com:ericforbes/private/my-postreview-test.git -> my-postreview-test
+        # https://gitlab.com/ericforbes/my-postreview-test.git -> my-postreview-test
+        project_match = re.search(r'%s(:|\/).*\/(?P<project>.*).git' % domain_fixed, remote_origin_url)
+
         try:
-            match_str = match.group(2).split("/")
-            return (match_str[0], match_str[1])
-        except IndexError:
+            # Remove any leading or trailing slashes -> ericforbes/private
+            namespace = namespace_match.group('namespace').strip("/")
+
+            project = project_match.group('project')
+
+            return (namespace, project)
+        except:
             return (None, None)
