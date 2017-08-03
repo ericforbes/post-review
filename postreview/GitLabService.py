@@ -23,12 +23,15 @@ class GitLabService(BaseService):
         return urljoin(str(url), str(path))
 
 
-    def parent_branch_exists(self):
-        url_path = '/projects/%s/repository/branches/%s' % (self._url_encoded_path(), self.parent_branch)
+    def parent_branch_exists(self, token):
+        url_path = 'projects/%s/repository/branches/%s' % (self._url_encoded_path(), self.parent_branch)
         url = self._API() + url_path
 
         try:
-            res = requests.get(url)
+            res = requests.get(
+                url,
+                headers={"PRIVATE-TOKEN": token}
+            )
         except Exception as e:
             self.logger.fatal(e)
             sys.exit()
@@ -60,9 +63,9 @@ class GitLabService(BaseService):
         try:
             res = requests.post(
                 url,
-                headers = headers,
-                data = params
-                )
+                headers=headers,
+                data=params
+            )
         except Exception as e:
             self.logger.fatal(e)
             sys.exit()
@@ -101,26 +104,14 @@ class GitLabService(BaseService):
         token = input("Please enter your Personal Access Token:  ")
 
         # Make request to resource that requires us to be authenticated
-        path = 'projects/%s/deploy_keys' % self._url_encoded_path()
+        path = 'projects/%s/labels' % self._url_encoded_path()
         url = urljoin(str(self._API()), path)
 
         res = requests.get(
             url,
-            headers = {"PRIVATE-TOKEN": token}
+            headers={"PRIVATE-TOKEN": token}
             )
 
         if res.status_code == 200:
             return(token, None)
         return(-1, "Invalid Personal Access Token")
-
-        #if res.status_code >= 400:
-        ##    return (-1, j.get('message', 'UNDEFINED ERROR (no error description from server)'))
-        #else:
-        #    try:
-        #        if not j['token'] and j['hashed_token']:
-        ##            #TODO: token is not in config, but its created. so its lost in the ether
-        #            return (-1, 'Token lost in ether. Please revoke the token then re-run cmd: https://github.com/settings/applications')
-        ##        else:
-         #           return (j['token'], None)
-         #   except KeyError:
-         #       return (-1, "Successful response but unable to fetch credentials.")
