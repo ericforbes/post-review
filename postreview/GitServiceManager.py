@@ -75,7 +75,7 @@ class GitServiceManager(object):
         Git.push_branch_to_remote(self.source_branch)
         token = self._get_set_api_token()
 
-        if not self.git_service_engine.parent_branch_exists():
+        if not self.git_service_engine.parent_branch_exists(token):
             self.logger.fatal("Target branch does not exist. Please try again")
             sys.exit()
 
