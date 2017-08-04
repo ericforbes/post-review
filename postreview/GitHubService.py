@@ -19,7 +19,7 @@ class GitHubService(BaseService):
     CLIENT_ID = '40435bdcc83a625b6c9b'
     CLIENT_SECRET = '81703a26b85a31127071c6bbbc54ac37ea970df3'
 
-    def parent_branch_exists(self):
+    def parent_branch_exists(self, token):
         path = '/repos/%s/%s/branches/%s' % (self.namespace, self.project, self.parent_branch)
         url = urljoin(str(self.API), str(path))
         try:
@@ -28,7 +28,6 @@ class GitHubService(BaseService):
             self.logger.fatal(e)
             sys.exit()
 
-        json_response = json.loads(res.text)
         if res.status_code == 404:
             return False
         return True
@@ -61,7 +60,6 @@ class GitHubService(BaseService):
         except Exception as e:
             self.logger.fatal(e)
             sys.exit()
-
 
         json_response = json.loads(res.text)
         if res.status_code == 401:

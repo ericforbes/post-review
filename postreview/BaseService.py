@@ -28,7 +28,7 @@ class BaseService(with_metaclass(Meta, object)):
     def _setup_token(self):
         raise NotImplementedError()
 
-    def parent_branch_exists(self):
+    def parent_branch_exists(self, token):
         raise NotImplementedError()
 
     @classmethod
