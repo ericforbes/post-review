@@ -84,7 +84,7 @@ class GitServiceManager(object):
         (msg, error) = self.git_service_engine.issue_pull_request(params)
         if error == 401:
             Git.remove_api_token(self.git_config_token_key)
-            self.logger.fatal("API token is invalid. Please try again to create a new token")
+            self.logger.fatal("API token is invalid. Please re-run the command to create a new token")
             sys.exit()
 
         self.logger.warn(msg+'\n')
