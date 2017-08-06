@@ -12,8 +12,13 @@ before_install:
         echo "Pull requests to Master branch can only originate from the develop branch" 1>&2;
         exit 1;
       fi
+    - pip install codecov
 
 install:
     - python scripts/install
 
-script: python scripts/run-tests
+script:
+    - python scripts/run-tests
+
+after_success:
+    - codecov
