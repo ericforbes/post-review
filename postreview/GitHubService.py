@@ -7,6 +7,7 @@ from .BaseService import BaseService
 import sys
 import json
 import re
+import random
 
 #Dependencies
 from urllib.parse import urljoin
@@ -94,10 +95,16 @@ class GitHubService(BaseService):
         pw = getpass.getpass("%s password: " % self.SERVICE_NAME)
         return (user, pw)
 
+    def _generate_fingerprint(self):
+        # https://developer.github.com/changes/2014-12-08-removing-authorizations-token/
+        # not a user-facing value, could be anything unique (per instance of repo)
+        return random.random()
+
     def _setup_token(self):
         u, p = self._req_user_pass()
-        url = urljoin(self.API, 'authorizations/clients/%s' % self.CLIENT_ID)
-        #TODO: Add Fingerprint
+        fingerprint = self._generate_fingerprint()
+        url = urljoin(self.API, 'authorizations/clients/%s/%s' % (self.CLIENT_ID, fingerprint))
+
         params = {
             'note': 'post-review cli utility (github, gitlab, etc)',
             'client_secret': self.CLIENT_SECRET,
@@ -117,7 +124,8 @@ class GitHubService(BaseService):
             try:
                 if not j['token'] and j['hashed_token']:
                     #TODO: token is not in config, but its created. so its lost in the ether
-                    return (-1, 'Token lost in ether. Please revoke the token then re-run cmd: https://github.com/settings/applications')
+                    return (-1, 'Token ID already in use or token lost in ether.\n'+
+                        'Please re-try with a new Token ID or Please revoke all tokens available: https://github.com/settings/applications')
                 else:
                     return (j['token'], None)
             except KeyError:
